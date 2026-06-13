@@ -26,17 +26,21 @@ public class StudentService {
 	
 	// update student
 	public String updateStudentService(int id, Student student) {
-		Student std = studentRepo.findById(id).orElseThrow(()->new RuntimeException("Data not found"));
-		if(std==null) {
-			return "Data not found";
-		}
-		std.setName(student.getName());
-		std.setEmail(student.getEmail());
-		std.setMobile(student.getMobile());
-		std.setAddress(student.getAddress());
-		
-		studentRepo.save(std);
-		return "Student detail update successfully";
+
+	    Student oldStudent = studentRepo.findById(id).orElse(null);
+
+	    oldStudent.setName(student.getName());
+	    oldStudent.setEmail(student.getEmail());
+	    oldStudent.setMobile(student.getMobile());
+	    oldStudent.setAddress(student.getAddress());
+
+	    if (student.getImage() != null) {
+	        oldStudent.setImage(student.getImage());
+	    }
+
+	    studentRepo.save(oldStudent);
+
+	    return "Student Updated Successfully";
 	}
 	
 	// delete student
