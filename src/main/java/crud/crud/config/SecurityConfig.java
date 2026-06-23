@@ -47,7 +47,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/register",
                                 "/auth/login",
-                                "/auth/forget"
+                                "/auth/forget",
+                                "/otp/**"
+                                
                         ).permitAll()
 
                         // All other APIs require JWT

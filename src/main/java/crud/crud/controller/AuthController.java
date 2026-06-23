@@ -1,10 +1,14 @@
 package crud.crud.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +19,7 @@ import crud.crud.dto.LoginRequest;
 import crud.crud.entity.User;
 import crud.crud.repository.UserRepository;
 import crud.crud.security.JwtUtil;
-import crud.crud.entity.User;
+import crud.crud.service.AuthService;
 
 @CrossOrigin("*")
 @RestController
@@ -30,46 +34,58 @@ public class AuthController {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	UserRepository userRepo;
-	
+	@Autowired
+	AuthService authServ;
+
 	// Register new user
 	@PostMapping("/register")
 	public String register(@RequestBody User user) {
-		if(userRepo.findByEmail(user.getEmail()).isPresent()) {
+		if (userRepo.findByEmail(user.getEmail()).isPresent()) {
 			return "User already exists";
 		}
-		user.setPassword(
-				passwordEncoder.encode(user.getPassword())
-				);
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		userRepo.save(user);
 		return "User register successfully";
 	}
-	
+
 	// Login Registered user
-	 @PostMapping("/login")
-	    public String login(
+	@PostMapping("/login")
+	    public ResponseEntity<?> login(
 	            @RequestBody LoginRequest request) {
 
-	        authenticationManager.authenticate(
-	                new UsernamePasswordAuthenticationToken(
-	                        request.getEmail(),
-	                        request.getPassword()));
+	        try {
+	        	authenticationManager.authenticate(
+		                new UsernamePasswordAuthenticationToken(
+		                        request.getEmail(),
+		                        request.getPassword()));
 
-	        return jwtUtil.generateToken(
-	                request.getEmail());
+		        String token = jwtUtil.generateToken(
+		                request.getEmail());
+		        return ResponseEntity.ok(token);
+	        }catch(UsernameNotFoundException e) {
+	        	return ResponseEntity.status(404).body("User not found");
+	        }catch(Exception e) {
+	        	return ResponseEntity.status(401).body("Invalid email or password");
+	        }
 	    }
-	 
-	 // Forget Password
-	 @PutMapping("/forget")
-	 public String forgetPassword(@RequestBody User user) {
-		 
-		if(userRepo.findByEmail(user.getEmail()).isPresent()) {
-		 	User olduser =  userRepo.findByEmail(user.getEmail()).get();
-		 	olduser.setPassword(passwordEncoder.encode(user.getPassword()));
+
+	// Forget Password
+	@PutMapping("/forget")
+	public String forgetPassword(@RequestBody User user) {
+
+		if (userRepo.findByEmail(user.getEmail()).isPresent()) {
+			User olduser = userRepo.findByEmail(user.getEmail()).get();
+			olduser.setPassword(passwordEncoder.encode(user.getPassword()));
 			userRepo.save(olduser);
 			return "Password Updated Successfully";
-		}
-		else {
+		} else {
 			return "User is not registered";
 		}
-	 }
+	}
+
+	// Delete User
+	@DeleteMapping("/deleteUser/{email}")
+	public ResponseEntity<?> deleteUserController(@PathVariable String email) {
+		return authServ.deleteUserService(email);
+	}
 }
