@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 "/auth/register",
                                 "/auth/login",
                                 "/auth/forget",
+                                "/auth/activateUser/{email}",
                                 "/otp/**"
                                 
                         ).permitAll()

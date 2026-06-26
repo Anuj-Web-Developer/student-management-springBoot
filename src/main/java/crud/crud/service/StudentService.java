@@ -3,6 +3,7 @@ package crud.crud.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import crud.crud.entity.Student;
@@ -21,24 +22,27 @@ public class StudentService {
 	
 	// read student
 	public List<Student> getStudentService() {
-		return studentRepo.findAll();
+		return studentRepo.findAll(
+				Sort.by(Sort.Direction.DESC, "id")
+				);
 	}
 	
 	// update student
 	public String updateStudentService(int id, Student student) {
 
-	    Student oldStudent = studentRepo.findById(id).orElse(null);
+//	    Student oldStudent = studentRepo.findById(id).orElse(null);
 
-	    oldStudent.setName(student.getName());
-	    oldStudent.setEmail(student.getEmail());
-	    oldStudent.setMobile(student.getMobile());
-	    oldStudent.setAddress(student.getAddress());
+//	    oldStudent.setName(student.getName());
+//	    oldStudent.setEmail(student.getEmail());
+//	    oldStudent.setMobile(student.getMobile());
+//	    oldStudent.setAddress(student.getAddress());
+//	    oldStudent.setDraft(student.getDraft());
 
-	    if (student.getImage() != null) {
-	        oldStudent.setImage(student.getImage());
-	    }
+//	    if (student.getImage() != null) {
+//	        oldStudent.setImage(student.getImage());
+//	    }
 
-	    studentRepo.save(oldStudent);
+	    studentRepo.save(student);
 
 	    return "Student Updated Successfully";
 	}

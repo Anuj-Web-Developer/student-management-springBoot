@@ -17,6 +17,7 @@ public class Student {
 	private String email;
 	private String mobile;
 	private String address;
+	private int draft;
 	@Lob
 	@Column(columnDefinition = "LONGBLOB")
 	private byte[] image;
@@ -25,7 +26,6 @@ public class Student {
 	public Integer getId() {
 		return id;
 	}
-	
 	public String getName() {
 		return name;
 	}
@@ -61,8 +61,15 @@ public class Student {
 	public void setImage(byte[] image) {
 		this.image = image;
 	}
+	
+	public void setDraft(int draft) {
+		this.draft = draft;
+	}
+	public int getDraft() {
+		return draft;
+	}
 
-	public Student(Integer id, String name, String email, String mobile, String address, byte[] image) {
+	public Student(Integer id, String name, String email, String mobile, String address, byte[] image, int draft) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -70,6 +77,7 @@ public class Student {
 		this.mobile = mobile;
 		this.address = address;
 		this.image = image;
+		this.draft = draft;
 	}
 
 	public Student() {

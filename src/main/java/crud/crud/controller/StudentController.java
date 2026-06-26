@@ -28,10 +28,18 @@ public class StudentController {
 	StudentService studentServ;
 
 	@PostMapping(value = "/saveStudent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public Student saveStudentController(@RequestPart("student") Student student,
-			@RequestPart("image") MultipartFile image) throws java.io.IOException {
+	public Student saveStudentController(
+			@RequestPart(value = "student", required = false) Student student,
+	        @RequestPart(value = "image", required = false) MultipartFile image)
+					throws java.io.IOException {
 
-		student.setImage(image.getBytes());
+		if (student == null) {
+	        student = new Student();
+	    }
+
+	    if (image != null && !image.isEmpty()) {
+	        student.setImage(image.getBytes());
+	    }
 		return studentServ.saveStudentService(student);
 	}
 
@@ -42,7 +50,7 @@ public class StudentController {
 		if (image != null && !image.isEmpty()) {
 			student.setImage(image.getBytes());
 		}
-
+		
 		return studentServ.updateStudentService(id, student);
 	}
 

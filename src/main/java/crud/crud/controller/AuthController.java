@@ -1,6 +1,7 @@
 package crud.crud.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -59,6 +60,11 @@ public class AuthController {
 		                        request.getEmail(),
 		                        request.getPassword()));
 
+	        	User user = userRepo.findByEmail(request.getEmail()).get();
+	        	if(user.getStatus().equalsIgnoreCase("Inactive")) {
+	        		return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Your account is deactivate, Activate your account then login");
+	        	}
+	        	
 		        String token = jwtUtil.generateToken(
 		                request.getEmail());
 		        return ResponseEntity.ok(token);
@@ -83,9 +89,15 @@ public class AuthController {
 		}
 	}
 
-	// Delete User
-	@DeleteMapping("/deleteUser/{email}")
-	public ResponseEntity<?> deleteUserController(@PathVariable String email) {
-		return authServ.deleteUserService(email);
+	// DeActivate User
+	@PutMapping("/deActiveUser/{email}")
+	public ResponseEntity<?> deActiveUserController(@PathVariable String email) {
+		return authServ.deActiveUserService(email);
+	}
+	
+	// Activate User
+	@PutMapping("/activateUser/{email}")
+	public ResponseEntity<?> activateUserController(@PathVariable String email) {
+		return authServ.activateUserService(email);
 	}
 }
